@@ -2,16 +2,16 @@
 
 Destination=$(pwd)
 Source=$(pwd)
-RemoveOriginal=false
-Seperate=false
+RemoveOriginal=0
+Seperate=0
 #Options
 
 while getopts "d:s:rm" option; do
 	case $option in
 		d) Destination=$OPTARG;;
 		s) Source=$OPTARG;;
-		m) Seperate=true;;
-		r) RemoveOriginal=true;;
+		m) Seperate=1;;
+		r) RemoveOriginal=1;;
 		\?) echo "Error: Invalid Option!"
 		exit;;
 	esac
@@ -44,24 +44,29 @@ echo "Starting unzip..."
 echo "Source: $Source"
 echo "Destination: $Destination"
 
-for i in ./*; do
-	file=$(basename "$i")
-	
-	if [[ $file = *.zip  ]]; then
-		echo "unzipping $file ..."
 
-		if [$Seperate]; then
-			unzip $file -d $Destination"/$file"
+
+
+
+#TODO: Check if a folder already exists then rename the new folder to something different
+for i in "$Source"/*; do
+	#echo "$i"
+	file=$(basename "$i")
+	#echo "$file"
+	if [[ "$file" = *.zip  ]]; then
+		echo "unzipping "$Source/$file" ..." 
+		if [ $Seperate = 1 ]; then
+			unzip "$Source/$file" -d "$Destination/$file"
 		else
-			unzip $file -d $Destinationi
+			unzip "$Source/$file" -d "$Destination"
 		fi
-		echo "Successfully unzipped $file"
+		#echo "Successfully unzipped $file"
 		
 
-		if [$RemoveOriginal]; then
-			echo "Removing"
-			rm $i
-			echo "Removed"
+		if [ $RemoveOriginal = 1 ]; then
+			#echo "Removing"
+			rm "$i"
+			#echo "Removed"
 		fi
 
 	fi
