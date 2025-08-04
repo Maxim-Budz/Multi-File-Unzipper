@@ -1,0 +1,95 @@
+#!/bin/bash
+
+Destination=$(pwd)
+Source=$(pwd)
+RemoveOriginal=0
+
+#Options
+while getopts "d:s:r" option; do
+	case $option in
+		d) Destination=$OPTARG;;
+		s) Source=$OPTARG;;
+		r) RemoveOriginal=1;;
+		\?) echo "Error: Invalid Option!"
+		exit;;
+	esac
+done
+
+if [ ! -d "$Source" ]; then
+	echo "Error: Source directory does not exist!"
+	exit
+fi
+
+if [ ! -d "$Destination" ]; then
+	echo "Destination does not exist! Create it? y/n"
+	read input
+
+	if [ $input = "Y" ] || [ $input = "y" ]; then
+		mkdir "$Destination"
+	else
+		exit
+	fi
+	
+fi
+
+
+
+#Functions
+getDuplicateFileName(){
+	originalName=$1;
+	i=1;
+	while [ -e "$Destination/$originalName($i)" ]
+	do
+		i=$(($i+1))
+	done
+	echo "$originalName($i)"
+}
+
+
+
+#MAIN CODE
+for i in "$Source"/*; do
+	file=$(basename "$i")
+	mime=$( file -b --mime-type "$i")
+	mime="${mime##*/}"
+	remove=1
+
+	fileName=$file
+
+	if [ "$mime" = "zip" ] || [ "$mime" = "x-tar" ] || [ "$mime" = "x-7z-compressed" ] || [ "$mime" = "x-bzip2" ] || [ "$mime" = "gzip" ]; then
+		fileName="${fileName%.*.*}"
+		fileName="${fileName%.*}"
+		if [ -e  "$Destination/$fileName" ]; then
+			fileName=$(getDuplicateFileName "$fileName")	
+		fi
+	fi
+	case "$mime" in
+
+		"zip")
+			#unzip zip
+			unzip "$Source/$file" -d "$Destination/$fileName";;
+		"x-tar")
+			#unzip tar
+			mkdir "$Destination/$fileName"
+			tar -xf "$Source/$file" -C "$Destinationd/$fileName";;
+		"x-7z-compressed")
+			#unzip tar
+			mkdir "$Destination/$fileName"
+			7z x "$Source/$file" -o"$Destination/$fileName";;
+
+		"x-bzip2")
+			#unzip tar
+			mkdir "$Destination/$fileName"
+			tar -xjf "$Source/$file" -C "$Destination/$fileName";;
+
+		"gzip")
+			#unzip tar.gz
+			mkdir "$Destination/$fileName"
+			tar -xzf "$Source/$file" -C "$Destination/$fileName";;
+		*)
+			remove=0;;
+	esac
+		if (( $RemoveOriginal == 1  &&  $remove == 1 )); then
+			rm "$i"
+		fi
+done
