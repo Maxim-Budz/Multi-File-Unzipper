@@ -1,10 +1,7 @@
-# Multi-File-Unzipper
-(Currently still in development)
+# # Munzip
+Multiple File Unzipper.
+# Will extract contents of all .zip, .tar, .7z, .tar.bz2 and tar.gz into a directory
 
-Supported file formats:
-.zip
-.7z
-.tar
-.tar.gz
-.tar.bz2
-
+# -s {Directory} , specify source directory
+# -d {Directory} , specify destination directory and will ask to create it if it doesnt exist
+# -r , will delete the zip files after extraction
