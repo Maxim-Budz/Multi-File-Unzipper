@@ -5,6 +5,7 @@ Source=$(pwd)
 RemoveOriginal=0
 
 #Options
+
 while getopts "d:s:r" option; do
 	case $option in
 		d) Destination=$OPTARG;;
@@ -35,6 +36,7 @@ fi
 
 
 #Functions
+
 getDuplicateFileName(){
 	originalName=$1;
 	i=1;
@@ -48,6 +50,7 @@ getDuplicateFileName(){
 
 
 #MAIN CODE
+
 for i in "$Source"/*; do
 	file=$(basename "$i")
 	mime=$( file -b --mime-type "$i")
@@ -66,28 +69,31 @@ for i in "$Source"/*; do
 	case "$mime" in
 
 		"zip")
-			#unzip zip
+			
 			unzip "$Source/$file" -d "$Destination/$fileName";;
+
 		"x-tar")
-			#unzip tar
+			
 			mkdir "$Destination/$fileName"
 			tar -xf "$Source/$file" -C "$Destinationd/$fileName";;
+
 		"x-7z-compressed")
-			#unzip tar
+			
 			mkdir "$Destination/$fileName"
 			7z x "$Source/$file" -o"$Destination/$fileName";;
 
 		"x-bzip2")
-			#unzip tar
+			
 			mkdir "$Destination/$fileName"
 			tar -xjf "$Source/$file" -C "$Destination/$fileName";;
 
 		"gzip")
-			#unzip tar.gz
+			
 			mkdir "$Destination/$fileName"
 			tar -xzf "$Source/$file" -C "$Destination/$fileName";;
 		*)
 			remove=0;;
+
 	esac
 		if (( $RemoveOriginal == 1  &&  $remove == 1 )); then
 			rm "$i"
